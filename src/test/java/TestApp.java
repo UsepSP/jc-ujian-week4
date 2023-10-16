@@ -12,7 +12,7 @@ import java.net.URL;
 public class TestApp {
     //instance Android driver
     private AndroidDriver driver;
-    private MobileElement samaDengan;
+    private static MobileElement tambah;
 
 
     @BeforeClass
@@ -22,14 +22,18 @@ public class TestApp {
         desiredCapabilities.setCapability("deviceName", "SM_M236B");
         desiredCapabilities.setCapability("udid","RRCT303G9VB");
         desiredCapabilities.setCapability("platforName","android");
-        desiredCapabilities.setCapability("appPackage","com.google.android.calculator");
-        desiredCapabilities.setCapability("appActivity","com.android.calculator2.Calculator");
+        desiredCapabilities.setCapability("appPackage","com.chad.financialrecord");
+        desiredCapabilities.setCapability("appActivity","com.rookie.catatankeuangan.feature.splash.SplashActivity");
         desiredCapabilities.setCapability("noreset",true);
 
         //URL
         URL url = new URL("http://127.0.0.1:4723/wd/hub");
-
         driver = new AndroidDriver<>(url,desiredCapabilities);
+
+        delay(2);
+        driver.findElementById("com.android.permissioncontroller:id/permission_allow_button").click();
+        delay(2);
+        driver.findElementById("android:id/button2").click();
 
 
     }
@@ -40,32 +44,56 @@ public class TestApp {
 
     @Test
     public void testAdd(){
-        MobileElement satu = (MobileElement) driver.findElementById("com.google.android.calculator:id/digit_1");
-        MobileElement dua = (MobileElement) driver.findElementById("com.google.android.calculator:id/digit_2");
-        MobileElement tambah = (MobileElement) driver.findElementById("com.google.android.calculator:id/op_add");
-        samaDengan = (MobileElement) driver.findElementById("com.google.android.calculator:id/eq");
-        satu.click();
+        tambah = (MobileElement) driver.findElementByXPath("//android.widget.ImageButton[contains(@bounds,\"891\")]");
         tambah.click();
-        dua.click();
-        samaDengan.click();
-        MobileElement hasil = (MobileElement) driver.findElementById("com.google.android.calculator:id/result_final");
+        delay(2);
+        MobileElement input = (MobileElement) driver.findElementById("com.chad.financialrecord:id/btnIncome");
+        MobileElement nominal = (MobileElement) driver.findElementById("com.chad.financialrecord:id/etAmount");
+        MobileElement note = (MobileElement) driver.findElementById("com.chad.financialrecord:id/etNote");
+        MobileElement save = (MobileElement) driver.findElementById("com.chad.financialrecord:id/btSave");
+
+        //step pemasukan
+        input.click();
+        nominal.sendKeys("10000");
+        note.sendKeys("test input pemasukan");
+        save.click();
+        delay(1);
+        MobileElement hasil = (MobileElement) driver.findElementByXPath("//android.widget.TextView[contains(@bounds,\"922\")]");
         String txtHasil = hasil.getText();
         System.out.println(txtHasil);
-        Assert.assertEquals(txtHasil,"3");
+        Assert.assertEquals(txtHasil,"10.000");
+
     }
 
     @Test
     public void testSub(){
-        MobileElement tiga = (MobileElement) driver.findElementById("com.google.android.calculator:id/digit_3");
-        MobileElement empat = (MobileElement) driver.findElementById("com.google.android.calculator:id/digit_4");
-        MobileElement kurang = (MobileElement) driver.findElementByXPath("//android.widget.ImageButton[contains(@content-desc,\"kura\")]");
-        tiga.click();
-        kurang.click();
-        empat.click();
-        samaDengan.click();
-        MobileElement hasilKurang = (MobileElement) driver.findElementById("com.google.android.calculator:id/result_final");
-        String txtHasilKurang = hasilKurang.getText();
-        System.out.println(txtHasilKurang);
-        Assert.assertEquals(txtHasilKurang,"−1");
+        //input pengeluaran
+        delay(2);
+        tambah.click();
+        delay(2);
+        MobileElement  input2 = (MobileElement) driver.findElementById("com.chad.financialrecord:id/btnExpense");
+        MobileElement nominal2 = (MobileElement) driver.findElementById("com.chad.financialrecord:id/etAmount");
+        MobileElement note2 = (MobileElement) driver.findElementById("com.chad.financialrecord:id/etNote");
+        MobileElement save2 = (MobileElement) driver.findElementById("com.chad.financialrecord:id/btSave");
+
+        //step keluar
+        input2.click();
+        nominal2.sendKeys("5000");
+        note2.sendKeys("test input pengeluaran");
+        save2.click();
+        delay(1);
+        MobileElement pengeluaran = (MobileElement) driver.findElementByXPath("//android.widget.TextView[contains(@bounds,\"935\")]");
+        String txtPengeluaran = pengeluaran.getText();
+        System.out.println(txtPengeluaran);
+        Assert.assertEquals(txtPengeluaran,"5.000");
+
+    }
+
+    static void delay (long detik) {
+        try {
+            Thread.sleep(detik * 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
